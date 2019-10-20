@@ -71,8 +71,9 @@
             this.buttonDecode.Name = "buttonDecode";
             this.buttonDecode.Size = new System.Drawing.Size(95, 36);
             this.buttonDecode.TabIndex = 3;
-            this.buttonDecode.Text = "Раскодировать";
+            this.buttonDecode.Text = "Декодировать";
             this.buttonDecode.UseVisualStyleBackColor = true;
+            this.buttonDecode.Click += new System.EventHandler(this.buttonDecode_Click);
             // 
             // buttonCode
             // 
