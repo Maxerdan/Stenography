@@ -43,8 +43,7 @@ namespace Stenography
 
         private void buttonCode_Click(object sender, EventArgs e)
         {
-            // добавить(изменить) текст из бокса
-            byte[] bytes = Encoding.ASCII.GetBytes("Divinity: Original Sin");
+            byte[] bytes = Encoding.ASCII.GetBytes(textToCode.Text);
             string bitString = "";
             for (int i = 0; i < bytes.Length; i++)
             {
@@ -93,8 +92,15 @@ namespace Stenography
                     break;
             }
             pictureBox1.Image = Bitmap;
-            // добавить выбор куда сохранять
-            Bitmap.Save("img.png", System.Drawing.Imaging.ImageFormat.Png);
+            // выбор куда сохранять
+            using (SaveFileDialog dialog = new SaveFileDialog())
+            {
+                dialog.Filter = "Изображения:|*.jpg;*.jpeg;*.bmp;*.png";
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    Bitmap.Save(dialog.FileName, System.Drawing.Imaging.ImageFormat.Png);
+                }
+            }
         }
 
         void ChangeColor(ref string bitString, ref string color)
@@ -170,9 +176,10 @@ namespace Stenography
                 if (is_brake)
                     break;
             }
-            
-            byte[] bytes = new byte[decodeString.Length / 8];
-            for(int i = 0; i < decodeString.Length / 8; i++)
+
+            int deStr_Size = decodeString.Length / 8;
+            byte[] bytes = new byte[deStr_Size];
+            for(int i = 0; i < deStr_Size; i++)
             {
                 var one_byte = decodeString.Substring(0, 8);
                 var integerByte = Convert.ToInt32(one_byte, 2);
