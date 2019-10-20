@@ -44,7 +44,7 @@ namespace Stenography
         private void buttonCode_Click(object sender, EventArgs e)
         {
             // добавить(изменить) текст из бокса
-            byte[] bytes = Encoding.ASCII.GetBytes("Hello world! 404");
+            byte[] bytes = Encoding.ASCII.GetBytes("Divinity: Original Sin");
             string bitString = "";
             for (int i = 0; i < bytes.Length; i++)
             {
@@ -106,7 +106,81 @@ namespace Stenography
 
         private void buttonDecode_Click(object sender, EventArgs e)
         {
+            string decodeString = "";
+            string decodePix = "";
+            bool is_brake = false;
+            Bitmap = new Bitmap(FileName, true);
+            for(int x = 0; x < Bitmap.Width; x++)
+            {
+                for(int y = 0; y < Bitmap.Height; y++)
+                {
+                    Color pixelColor = Bitmap.GetPixel(x, y);
+                    var R = Convert.ToString(pixelColor.R, 2).PadLeft(8, '0');
+                    var G = Convert.ToString(pixelColor.G, 2).PadLeft(8, '0');
+                    var B = Convert.ToString(pixelColor.B, 2).PadLeft(8, '0');
 
+                    if (decodePix.Length != 8)
+                    {
+                        decodePix += R[7];
+                    }
+                    else if(decodePix == "00000000")
+                    {
+                        is_brake = true;
+                        break;
+                    }
+                    else
+                    {
+                        decodeString += decodePix;
+                        decodePix = "";
+                        decodePix += R[7];
+                    }
+
+                    if (decodePix.Length != 8)
+                    {
+                        decodePix += G[7];
+                    }
+                    else if (decodePix == "00000000")
+                    {
+                        is_brake = true;
+                        break;
+                    }
+                    else
+                    {
+                        decodeString += decodePix;
+                        decodePix = "";
+                        decodePix += G[7];
+                    }
+
+                    if (decodePix.Length != 8)
+                    {
+                        decodePix += B[7];
+                    }
+                    else if (decodePix == "00000000")
+                    {
+                        is_brake = true;
+                        break;
+                    }
+                    else
+                    {
+                        decodeString += decodePix;
+                        decodePix = "";
+                        decodePix += B[7];
+                    }
+                }
+                if (is_brake)
+                    break;
+            }
+            
+            byte[] bytes = new byte[decodeString.Length / 8];
+            for(int i = 0; i < decodeString.Length / 8; i++)
+            {
+                var one_byte = decodeString.Substring(0, 8);
+                var integerByte = Convert.ToInt32(one_byte, 2);
+                bytes[i] = (byte)integerByte;
+                decodeString = decodeString.Substring(8);
+            }
+            decodeString = Encoding.ASCII.GetString(bytes);
+            MessageBox.Show(decodeString);
         }
     }
 }
