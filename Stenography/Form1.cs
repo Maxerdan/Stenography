@@ -96,13 +96,13 @@ namespace Stenography
 
         private string GetStringOfBinaryCode() // получение строки двоичного кода для последующего кодирования
         {
-            byte[] bytes = Encoding.ASCII.GetBytes(textToCode.Text);
+            byte[] bytes = Encoding.GetEncoding(866).GetBytes(textToCode.Text);
             string bitString = "";
             for (int i = 0; i < bytes.Length; i++)
             {
-                bitString += Convert.ToString(bytes[i], 2).PadLeft(8, '0');
+                bitString += Convert.ToString(bytes[i], 2).PadLeft(16, '0');
             }
-            for (int i = 0; i < 8; i++)
+            for (int i = 0; i < 16; i++)
             {
                 bitString += '0';
             }
@@ -132,11 +132,11 @@ namespace Stenography
                     var G = Convert.ToString(pixelColor.G, 2).PadLeft(8, '0');
                     var B = Convert.ToString(pixelColor.B, 2).PadLeft(8, '0');
 
-                    if (decodePix.Length != 8)
+                    if (decodePix.Length != 16)
                     {
                         decodePix += R[7];
                     }
-                    else if(decodePix == "00000000")
+                    else if(decodePix == "0000000000000000")
                     {
                         is_brake = true;
                         break;
@@ -148,11 +148,11 @@ namespace Stenography
                         decodePix += R[7];
                     }
 
-                    if (decodePix.Length != 8)
+                    if (decodePix.Length != 16)
                     {
                         decodePix += G[7];
                     }
-                    else if (decodePix == "00000000")
+                    else if (decodePix == "0000000000000000")
                     {
                         is_brake = true;
                         break;
@@ -164,11 +164,11 @@ namespace Stenography
                         decodePix += G[7];
                     }
 
-                    if (decodePix.Length != 8)
+                    if (decodePix.Length != 16)
                     {
                         decodePix += B[7];
                     }
-                    else if (decodePix == "00000000")
+                    else if (decodePix == "0000000000000000")
                     {
                         is_brake = true;
                         break;
@@ -184,16 +184,16 @@ namespace Stenography
                     break;
             }
 
-            int deStr_Size = decodeString.Length / 8; 
+            int deStr_Size = decodeString.Length / 16; 
             byte[] bytes = new byte[deStr_Size];
             for(int i = 0; i < deStr_Size; i++) // цикл для перевода 8 битов двоичного кода в байтовое представление
             {
-                var one_byte = decodeString.Substring(0, 8);
+                var one_byte = decodeString.Substring(0, 16);
                 var integerByte = Convert.ToInt32(one_byte, 2);
                 bytes[i] = (byte)integerByte;
-                decodeString = decodeString.Substring(8);
+                decodeString = decodeString.Substring(16);
             }
-            decodeString = Encoding.ASCII.GetString(bytes); // перевод из байтов в символы текста
+            decodeString = Encoding.GetEncoding(866).GetString(bytes); // перевод из байтов в символы текста
             MessageBox.Show(decodeString);
         }
     }
