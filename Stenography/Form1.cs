@@ -13,9 +13,9 @@ namespace Stenography
 {
     public partial class Form1 : Form
     {
-        string FileName;
-        Image LoadImage;
-        Bitmap Bitmap;
+        string FileName; // путь до файла
+        Image LoadImage; // само изображение
+        Bitmap Bitmap; // карта пикселей изображения
 
         public Form1()
         {
@@ -27,35 +27,26 @@ namespace Stenography
 
         }
 
-        private void choosePic_Click(object sender, EventArgs e)
+        private void choosePic_Click(object sender, EventArgs e) // выбор изображения
         {
             using (OpenFileDialog dialog = new OpenFileDialog())
             {
                 dialog.Filter = "Изображения:|*.jpg;*.jpeg;*.bmp;*.png";
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
-                    FileName = dialog.FileName;
+                    FileName = dialog.FileName; 
                     LoadImage = Image.FromFile(FileName);
-                    pictureBox1.Image = LoadImage;
+                    pictureBox1.Image = LoadImage; // вывод на экран
                 }
             }
         }
 
-        private void buttonCode_Click(object sender, EventArgs e)
+        private void buttonCode_Click(object sender, EventArgs e) // кодирование в выбранное изображение
         {
-            byte[] bytes = Encoding.ASCII.GetBytes(textToCode.Text);
-            string bitString = "";
-            for (int i = 0; i < bytes.Length; i++)
-            {
-                bitString += Convert.ToString(bytes[i], 2).PadLeft(8, '0');
-            }
-            for(int i = 0; i < 8; i++)
-            {
-                bitString += '0';
-            }
-
+            string bitString = GetStringOfBinaryCode();
             Bitmap = new Bitmap(FileName, true);
             bool is_brake = false;
+
             for (int x = 0; x < Bitmap.Width; x++)
             {
                 for (int y = 0; y < Bitmap.Height; y++)
@@ -65,7 +56,7 @@ namespace Stenography
                     var R = Convert.ToString(pixelColor.R, 2).PadLeft(8, '0');
                     var G = Convert.ToString(pixelColor.G, 2).PadLeft(8, '0');
                     var B = Convert.ToString(pixelColor.B, 2).PadLeft(8, '0');
-                    if(bitString.Length == 0)
+                    if (bitString.Length == 0)
                     {
                         is_brake = true;
                         break;
@@ -92,8 +83,8 @@ namespace Stenography
                     break;
             }
             pictureBox1.Image = Bitmap;
-            // выбор куда сохранять
-            using (SaveFileDialog dialog = new SaveFileDialog())
+            
+            using (SaveFileDialog dialog = new SaveFileDialog()) // выбор куда сохранять
             {
                 dialog.Filter = "Изображения:|*.jpg;*.jpeg;*.bmp;*.png";
                 if (dialog.ShowDialog() == DialogResult.OK)
@@ -103,14 +94,30 @@ namespace Stenography
             }
         }
 
-        void ChangeColor(ref string bitString, ref string color)
+        private string GetStringOfBinaryCode() // получение строки двоичного кода для последующего кодирования
+        {
+            byte[] bytes = Encoding.ASCII.GetBytes(textToCode.Text);
+            string bitString = "";
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                bitString += Convert.ToString(bytes[i], 2).PadLeft(8, '0');
+            }
+            for (int i = 0; i < 8; i++)
+            {
+                bitString += '0';
+            }
+
+            return bitString;
+        }
+
+        void ChangeColor(ref string bitString, ref string color) // удаление последнего бита цвета и запись нужного
         {
             color = color.Remove(color.Length - 1);
             color += bitString[0];
             bitString = bitString.Remove(0, 1);
         }
 
-        private void buttonDecode_Click(object sender, EventArgs e)
+        private void buttonDecode_Click(object sender, EventArgs e) // декодирование изображения
         {
             string decodeString = "";
             string decodePix = "";
@@ -177,16 +184,16 @@ namespace Stenography
                     break;
             }
 
-            int deStr_Size = decodeString.Length / 8;
+            int deStr_Size = decodeString.Length / 8; 
             byte[] bytes = new byte[deStr_Size];
-            for(int i = 0; i < deStr_Size; i++)
+            for(int i = 0; i < deStr_Size; i++) // цикл для перевода 8 битов двоичного кода в байтовое представление
             {
                 var one_byte = decodeString.Substring(0, 8);
                 var integerByte = Convert.ToInt32(one_byte, 2);
                 bytes[i] = (byte)integerByte;
                 decodeString = decodeString.Substring(8);
             }
-            decodeString = Encoding.ASCII.GetString(bytes);
+            decodeString = Encoding.ASCII.GetString(bytes); // перевод из байтов в символы текста
             MessageBox.Show(decodeString);
         }
     }
